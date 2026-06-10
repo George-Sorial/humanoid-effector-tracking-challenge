@@ -1,0 +1,7 @@
+gymnasium[mujoco]==1.0.0a2
+stable-baselines3[extra]==2.5.0
+numpy<2.0
+matplotlib
+scipy
+tensorboard
+pybullet
