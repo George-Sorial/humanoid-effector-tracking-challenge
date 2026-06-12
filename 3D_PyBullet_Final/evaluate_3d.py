@@ -6,12 +6,10 @@ from stable_baselines3 import PPO
 from env_3d import TrajectoryTracking3DEnv
 import pybullet as p
 
-
 def smooth_curve(data, window_size=50):
     if len(data) < window_size:
         return data
     return np.convolve(data, np.ones(window_size) / window_size, mode='valid')
-
 
 def draw_trajectory_preview(env, num_points=200):
     """Draw the full desired trajectory as a static red dotted path in PyBullet."""
@@ -20,13 +18,12 @@ def draw_trajectory_preview(env, num_points=200):
         p.addUserDebugLine(
             pts[i].tolist(), pts[i + 1].tolist(),
             lineColorRGB=[1.0, 0.1, 0.1],
-            lineWidth=1.5,
+            lineWidth=3,
             lifeTime=0   # 0 = permanent
         )
     # Mark the start with a sphere-like cluster
     p.addUserDebugText("TARGET PATH", pts[0].tolist(),
                        textColorRGB=[1, 0, 0], textSize=1.2, lifeTime=0)
-
 
 def main():
     os.makedirs("results", exist_ok=True)
@@ -59,6 +56,8 @@ def main():
             ax2.set_title("Converged Performance (Final 20% of Training)")
             ax2.set_xlabel("Completed Episodes")
             ax2.set_ylabel("Mean Euclidean Error (meters)")
+            # Fix zoom level for tight error bars
+            ax2.set_ylim(0, 0.005)
             ax2.grid(True, linestyle="--", alpha=0.6)
             ax2.legend()
 
@@ -86,6 +85,15 @@ def main():
 
     obs, info = env.reset()
 
+    # ── CAMERA SETUP ──
+    camera_yaw = 225.0
+    p.resetDebugVisualizerCamera(
+        cameraDistance=1.2, 
+        cameraYaw=camera_yaw, 
+        cameraPitch=-10, 
+        cameraTargetPosition=[0.2, 0, 0.25]
+    )
+
     # ── Draw the full desired trajectory immediately on reset ─────────────────
     draw_trajectory_preview(env, num_points=env.max_steps)
 
@@ -110,13 +118,7 @@ def main():
                 lifeTime=0   # permanent — builds up the full path
             )
 
-        # ── Live target cursor (bright yellow dot) ────────────────────────────
-        p.addUserDebugText(
-            "◆", target_pos.tolist(),
-            textColorRGB=[1.0, 0.9, 0.0],
-            textSize=1.0,
-            lifeTime=0.08   # flickers along the path
-        )
+
 
         prev_ee = ee_pos.copy()
 
@@ -198,8 +200,10 @@ def main():
     plt.savefig("results/tracking_performance_3d.png", dpi=150, bbox_inches='tight')
     print("Saved: results/tracking_performance_3d.png")
 
-    env.close()
-
+    try:
+        env.close()
+    except Exception:
+        pass
 
 if __name__ == "__main__":
     main()
