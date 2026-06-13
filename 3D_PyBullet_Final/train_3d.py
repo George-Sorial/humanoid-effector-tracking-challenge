@@ -5,6 +5,13 @@ from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv
 from env_3d import TrajectoryTracking3DEnv
+from typing import Callable
+
+def linear_schedule(initial_value: float) -> Callable[[float], float]:
+    """Linear learning rate schedule."""
+    def func(progress_remaining: float) -> float:
+        return progress_remaining * initial_value
+    return func
 
 class ErrorLoggingCallback(BaseCallback):
     def __init__(self, check_freq=1, log_dir="results", verbose=0):
@@ -34,7 +41,7 @@ def main():
     model = PPO(
         "MlpPolicy",
         env,
-        learning_rate=0.0003, # Slightly lower for 7-DOF stability
+        learning_rate=linear_schedule(0.0003), # Decays to 0 over training
         n_steps=2048,
         batch_size=128,
         n_epochs=10,
@@ -42,6 +49,7 @@ def main():
         gae_lambda=0.95,
         clip_range=0.2,
         ent_coef=0.0,
+        policy_kwargs=dict(net_arch=dict(pi=[256, 256], vf=[256, 256])), # Expanded network
         verbose=1,
         device="cpu"
     )

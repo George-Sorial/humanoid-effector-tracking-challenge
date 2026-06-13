@@ -175,7 +175,7 @@ def main():
     ax3.legend(fontsize=9)
     ax3.grid(True, linestyle=':', alpha=0.6)
 
-    # NEW Panel 4: Error Histogram
+    # Panel 4: Error Histogram
     ax4 = fig.add_subplot(224)
     n, bins, patches = ax4.hist(steady * 100, bins=20, color='purple', alpha=0.7, edgecolor='black')
     ax4.axvline(steady.mean() * 100, color='darkred', ls='--', lw=2, label=f"Mean Error: {steady.mean()*100:.2f} cm")

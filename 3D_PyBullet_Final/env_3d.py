@@ -24,7 +24,7 @@ class TrajectoryTracking3DEnv(gym.Env):
             low=-1.0, high=1.0, shape=(7,), dtype=np.float32
         )
         
-        # NEW: Obs space expanded to 26 to include the "Lookahead Target" (3 vars)
+        # Obs space expanded to 26 to include the "Lookahead Target" (3 vars)
         self.observation_space = spaces.Box(
             low=-np.inf, high=np.inf, shape=(26,), dtype=np.float32
         )
@@ -35,7 +35,7 @@ class TrajectoryTracking3DEnv(gym.Env):
         self.dt = 1.0 / 240.0
         
         # ─── Control & Filtering Parameters ───
-        self.action_alpha = 0.4     # Action smoothing factor (Lower = smoother, Higher = more reactive)
+        self.action_alpha = 0.5     # Increased from 0.4: allows the network to be more reactive
         self.lookahead_steps = 5    # How far into the future the agent sees
         
         self.HOME_JOINTS = np.array([0.0, 0.4, 0.0, -1.0, 0.0, 0.8, 0.0], dtype=np.float32)
@@ -92,7 +92,7 @@ class TrajectoryTracking3DEnv(gym.Env):
         target_pos = self._get_target(self.t)
         pos_error  = target_pos - ee_pos
         
-        # NEW: Get the future target position for predictive control
+        # Get the future target position for predictive control
         future_target_pos = self._get_target(self.t + self.lookahead_steps)
 
         return np.concatenate([
@@ -101,22 +101,21 @@ class TrajectoryTracking3DEnv(gym.Env):
             ee_pos, 
             target_pos, 
             pos_error, 
-            future_target_pos  # Added predictive lookahead
+            future_target_pos  # Predictive lookahead
         ])
 
     def step(self, action):
         self.t += 1
 
-        # ─── ENHANCEMENT: Action Smoothing (Low-Pass Filter) ───
-        # Blends the current network action with the previous executed action
+        # Action Smoothing (Low-Pass Filter)
         filtered_action = (self.action_alpha * action) + ((1.0 - self.action_alpha) * self.prev_filtered_action)
         self.prev_filtered_action = filtered_action.copy()
 
-        # Rescale the smoothed action to physical joint limits
-        rescaled_action = filtered_action * 0.05
+        # Increased from 0.05 to 0.08: gives motors more authority to catch up
+        rescaled_action = filtered_action * 0.08
 
         noise = np.random.normal(0, 0.005, size=action.shape).astype(np.float32)
-        noisy_action = np.clip(rescaled_action + noise, -0.05, 0.05)
+        noisy_action = np.clip(rescaled_action + noise, -0.08, 0.08)
 
         current_joints = np.array(
             [p.getJointState(self.robot, i)[0] for i in range(7)], dtype=np.float32
@@ -145,11 +144,10 @@ class TrajectoryTracking3DEnv(gym.Env):
         sigma_dynamic = sigma_0 + lambd * effort
 
         r_precision  = np.exp(-(dist ** 2) / (sigma_dynamic ** 2))
-        
-        # Penalize the raw action jerk so the network learns to output smooth intent
         action_jerk  = float(np.sum((action - self.prev_raw_action) ** 2))
 
-        reward = (3.0 * r_precision) - (1.0 * dist) - (0.05 * action_jerk) - (0.005 * effort)
+        # Added 10.0 * (dist ** 2) to ruthlessly penalize max error spikes
+        reward = (3.0 * r_precision) - (1.0 * dist) - (10.0 * (dist ** 2)) - (0.05 * action_jerk) - (0.005 * effort)
 
         self.prev_raw_action = action.copy()
         self.episode_errors.append(dist)
