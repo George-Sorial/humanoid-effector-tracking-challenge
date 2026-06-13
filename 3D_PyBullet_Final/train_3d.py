@@ -50,7 +50,7 @@ def main():
     error_callback = ErrorLoggingCallback(log_dir="results")
     
     print("Starting training loop...")
-    model.learn(total_timesteps=300000, callback=error_callback)
+    model.learn(total_timesteps=500000, callback=error_callback)
     
     model.save("models/ppo_kuka_tracking_3d")
     np.save("results/training_errors.npy", np.array(error_callback.history))
