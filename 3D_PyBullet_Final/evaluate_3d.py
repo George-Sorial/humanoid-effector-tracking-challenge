@@ -130,12 +130,17 @@ def main():
     ee_tv = calculate_total_variation(ee_traj[30:170])
     target_tv = calculate_total_variation(target_traj[30:170])
     
+    # Calculate Jitter Metrics inside Steady-State Window
+    jitter = np.abs(np.diff(steady))
+    
     print(f"\n── Evaluation Metrics (steady-state, steps 30–170) ──────")
     print(f"  Mean error  : {steady.mean()*100:.2f} cm")
     print(f"  RMSE        : {np.sqrt((steady**2).mean())*100:.2f} cm")
     print(f"  Max error   : {steady.max()*100:.2f} cm")
     print(f"  P95 error   : {np.percentile(steady, 95)*100:.2f} cm")
     print(f"  Smoothness  : EE Path Length {ee_tv:.3f}m (Target: {target_tv:.3f}m)")
+    print(f"  Mean Jitter : {np.mean(jitter)*100:.3f} cm/step")
+    print(f"  Max Jitter  : {np.max(jitter)*100:.3f} cm/step")
     print(f"─────────────────────────────────────────────────────────")
 
     # ── Enhanced 4-Panel Plot ──────────────────────────────────────────────────
