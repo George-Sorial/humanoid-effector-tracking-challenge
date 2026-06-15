@@ -48,8 +48,16 @@ class TrajectoryTracking3DEnv(gym.Env):
             p.resetJointState(self.robot, i, angle)
         for _ in range(20): p.stepSimulation()
 
+    # 1. Capture the initial raw sensor state to kickstart the filter memory
+        init_raw_obs = self._get_raw_obs()
+        self.filtered_obs = init_raw_obs.copy()
+
+        # 2. Get your official filtered observation vector for the agent
         obs = self._get_obs()
+        
+        # 3. Calculate your tracking distance metrics using the smoothed vectors
         self.prev_dist = float(np.linalg.norm(obs[14:17] - obs[17:20]))
+        
         return obs, {}
 
     def _get_target(self, t_offset):
@@ -59,12 +67,33 @@ class TrajectoryTracking3DEnv(gym.Env):
         z = 0.55 + (self.current_radius / 2) * np.sin(2 * self.current_omega * time)
         return np.array([x, y, z], dtype=np.float32)
 
-    def _get_obs(self):
+    def _get_raw_obs(self):
+        """Returns the current raw observation vector corrupted by sensor noise."""
         js = p.getJointStates(self.robot, range(7))
         j_pos, j_vel = np.array([s[0] for s in js]), np.array([s[1] for s in js])
         ee_pos = np.array(p.getLinkState(self.robot, self.ee_index)[0])
+        
         target = self._get_target(self.t)
-        return np.concatenate([j_pos, j_vel, ee_pos, target, target - ee_pos, self._get_target(self.t + self.lookahead_steps)])
+        future_target = self._get_target(self.t + self.lookahead_steps)
+        
+        # Clean 26-dimensional state vector
+        clean_obs = np.concatenate([j_pos, j_vel, ee_pos, target, target - ee_pos, future_target])
+        
+        # Raw sensor noise generation (1mm standard deviation)
+        sensor_noise = np.random.normal(0, 0.001, size=clean_obs.shape).astype(np.float32)
+        return clean_obs + sensor_noise
+
+    def _get_obs(self):
+        """Applies an Exponential Moving Average (EMA) to smooth out sensor noise."""
+        raw_noisy_obs = self._get_raw_obs()
+        
+        # 0.70 alpha balanced the filter delay perfectly against the jitter suppression
+        obs_alpha = 0.5
+        
+        # Compute the low-pass filtered vector
+        self.filtered_obs = (obs_alpha * raw_noisy_obs) + ((1.0 - obs_alpha) * self.filtered_obs)
+        
+        return self.filtered_obs.astype(np.float32)
 
     def step(self, action):
         self.t += 1
