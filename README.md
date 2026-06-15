@@ -21,17 +21,27 @@ This repository contains an advanced Reinforcement Learning (RL) controller for 
 ## Repository Structure
 ```text
 humanoid-effector-tracking-challenge/
-├── README.md                          # Global submission documentation
-└── 3D_PyBullet_Final/                 # Core implementation package
-    ├── env_3d.py                      # Custom Gymnasium PyBullet environment
-    ├── train_3d.py                    # SB3 PPO training pipeline & schedules
-    ├── evaluate_3d.py                 # Evaluation, calculation, & plotting script
+├── README.md                           # Global submission documentation
+└── 3D_PyBullet_Final/                  # Core implementation package
+    ├── env_3d.py                       # Custom Gymnasium PyBullet environment
+    ├── train_3d.py                     # SB3 PPO training pipeline & schedules
+    ├── evaluate_3d.py                  # Evaluation, calculation, & plotting script
     ├── models/
-    │   └── ppo_kuka_tracking_3d.zip   # Trained champion policy weights
+    │   └── ppo_kuka_tracking_3d.zip    # Trained champion policy weights
     └── results/
-        ├── training_errors.npy        # Raw metric logs from training history
-        ├── training_error_curve_3d.png# Visualized convergence trend curves
-        └── tracking_performance_3d.png# 4-panel deployment verification plot
+        ├── training_errors.npy         # Raw metric logs from training history
+        ├── training_error_curve_3d.png # Visualized convergence trend curves
+        └── tracking_performance_3d.png # 4-panel deployment verification plot
+└── 2D_MuJoCo_Prototype/                # Initial Version of project
+    ├── env.py                          # Custom 2D environment
+    ├── train.py                    
+    ├── evaluate.py                 
+    ├── models/
+    │   └── ppo_reacher_tracking.zip   
+    └── results/
+        ├── training_errors.npy       
+        ├── training_error_curve.png  
+        └── tracking_performance.png  
 ```
 
 ## 1. System Architecture & Design Note
@@ -182,14 +192,4 @@ python 3D_PyBullet_Final/evaluate_3d.py
 To overwrite or train a new policy from scratch using the optimized multi-objective PPO configuration:
 ```bash
 python 3D_PyBullet_Final/train_3d.py
-```
-
----
-
-## Generated Artifacts & Deliverables
-
-Upon running `evaluate_3d.py`, the system saves the following diagnostic deliverables to the root directory for review:
-
-* `tracking_performance_plot.png`: Displays 3D spatial alignment, Cartesian error timelines, and joint velocity tracking profiles.
-* `trajectory_video.mp4`: A high-fidelity PyBullet GUI render tracking the dynamic 3D target pathway.
 ```
