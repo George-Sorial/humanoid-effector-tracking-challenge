@@ -122,7 +122,7 @@ python 3D_PyBullet_Final/train_3d.py
 
 ---
 
-## 📺 Generated Artifacts & Deliverables
+## Generated Artifacts & Deliverables
 
 Upon running `evaluate_3d.py`, the system saves the following diagnostic deliverables to the root directory for review:
 
