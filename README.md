@@ -66,7 +66,7 @@ The project progressed across three major code branches, systematically moving f
 * **Focus:** Co-optimizing accuracy and fluidity while breaking the standard robotics trade-off curve.
 * **Mechanism:** Combined a `0.70` alpha EMA filter with a **lookahead horizon** step, allowing the policy to anticipate path shifts and pre-compensate for system latency.
 
-### 📊 Comparative Performance Ledger
+### Comparative Performance Ledger
 
 | Metric | Branch 1: Baseline | Branch 2: PPO | Branch 3: Lookahead (Current) | Status (Branch 2 vs 3) |
 | :--- | :--- | :--- | :--- | :--- |
