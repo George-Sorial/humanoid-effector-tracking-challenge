@@ -4,7 +4,7 @@ This repository contains an advanced Reinforcement Learning (RL) controller for 
 
 ---
 
-## 📋 Quick Submission Overview
+## Quick Submission Overview
 
 ### 1. Project Component Checklist
 * **Self-Contained Code:** Included in the implementation directory (`/3D_PyBullet_Final`).
