@@ -22,26 +22,26 @@ This repository contains an advanced Reinforcement Learning (RL) controller for 
 ```text
 humanoid-effector-tracking-challenge/
 ├── README.md                           # Global submission documentation
-└── 3D_PyBullet_Final/                  # Core implementation package
-    ├── env_3d.py                       # Custom Gymnasium PyBullet environment
-    ├── train_3d.py                     # SB3 PPO training pipeline & schedules
-    ├── evaluate_3d.py                  # Evaluation, calculation, & plotting script
+├── 3D_PyBullet_Final/                  # Core implementation package
+│   ├── env_3d.py                       # Custom Gymnasium PyBullet environment
+│   ├── train_3d.py                     # SB3 PPO training pipeline & schedules
+│   ├── evaluate_3d.py                  # Evaluation, calculation, & plotting script
+│   ├── models/
+│   │   └── ppo_kuka_tracking_3d.zip    # Trained champion policy weights
+│   └── results/
+│       ├── training_errors.npy         # Raw metric logs from training history
+│       ├── training_error_curve_3d.png # Visualized convergence trend curves
+│       └── tracking_performance_3d.png # 4-panel deployment verification plot
+└── 2D_MuJoCo_Prototype/                # Legacy proof-of-concept prototype
+    ├── env.py                          # Custom 2D planar tracking environment
+    ├── train.py                        # Baseline PPO training pipeline for 2D reacher
+    ├── evaluate.py                     # Evaluation and plotting script for 2D model
     ├── models/
-    │   └── ppo_kuka_tracking_3d.zip    # Trained champion policy weights
+    │   └── ppo_reacher_tracking.zip    # Pre-trained baseline policy weights
     └── results/
-        ├── training_errors.npy         # Raw metric logs from training history
-        ├── training_error_curve_3d.png # Visualized convergence trend curves
-        └── tracking_performance_3d.png # 4-panel deployment verification plot
-└── 2D_MuJoCo_Prototype/                # Initial Version of project
-    ├── env.py                          # Custom 2D environment
-    ├── train.py                    
-    ├── evaluate.py                 
-    ├── models/
-    │   └── ppo_reacher_tracking.zip   
-    └── results/
-        ├── training_errors.npy       
-        ├── training_error_curve.png  
-        └── tracking_performance.png  
+        ├── training_errors.npy         # Metric logs from prototype training history
+        ├── training_error_curve.png    # Visualized baseline convergence trends
+        └── tracking_performance.png    # Tracking performance visualization for 2D
 ```
 
 ## 1. System Architecture & Design Note
