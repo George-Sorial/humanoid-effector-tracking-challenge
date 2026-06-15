@@ -33,14 +33,14 @@ The observation space is a **26-dimensional continuous vector** designed to prov
 ### Action Space Design
 The policy outputs a **7-dimensional normalized vector** `[-1.0, 1.0]`. Rather than raw motor commands, actions are processed through an online **Exponential Moving Average (EMA) filter**:
 
-A_t = alpha * a_raw_t + (1 - alpha) * A_{t-1}
+$$A_t = \alpha \cdot a^{\text{raw}}_t + (1 - \alpha) \cdot A_{t-1}$$
 
 This effectively cuts off high-frequency policy chatter, converting raw neural network outputs into physically viable, torque-bounded joint movements.
 
 ### Reward Function Design
 To balance precision against structural wear, the reward function R_t is constructed as:
 
-R_t = w1 * exp(-||e||^2 / (2 * sigma^2)) - w2 * ||e||^2 - w3 * ||delta A_t||^2
+$$R_t = w_1 \cdot e^{-\frac{\|e\|_2^2}{2\sigma^2}} - w_2 \cdot \|e\|_2^2 - w_3 \cdot \|\Delta A_t\|_2^2$$
 
 * **Precision Component (w1):** Sharp Gaussian peak providing strong gradients when the tracker is within millimeters of the target.
 * **Spike Penalty (w2):** Quadratic penalty targeting large tracking errors to minimize worst-case outliers.
