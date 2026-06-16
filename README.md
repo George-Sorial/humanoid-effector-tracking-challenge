@@ -1,5 +1,5 @@
 # Humanoid Effector Tracking Challenge: Kuka IIWA 3D Trajectory Tracking
-
+ 
 This repository contains an advanced Reinforcement Learning (RL) controller for a 7-DOF Kuka IIWA robotic arm. The system is designed to achieve high-precision, smooth, and generalized tracking of dynamic 3D trajectories under explicit sensor noise, satisfying the core requirements of the evaluation challenge.
 
 ---
